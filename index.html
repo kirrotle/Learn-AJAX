@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="./JS/axios/axios.min.js"></script>
+  <script src="./bootstrap5.3.3/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="./bootstrap5.3.3/css/bootstrap.min.css">
+</head>
+
+<style>
+  div {
+    display: inline-block;
+  }
+</style>
+
+<body>
+
+  <div style="width: 500px;">
+    <label class="form-label">省份名字</label>
+    <input class="form-control" type="text" id="Province" value="北京">
+  </div>
+  <div style="width: 500px;">
+    <label class="form-label">城市名字</label>
+    <input class="form-control" type="text" id="City" value="北京市">
+  </div>
+  <br>
+  <input class="btn btn-danger" type="button" id="SubmitBtn" value="送出">
+  <br>
+  <table class="table table-success">
+    <thead>
+      <tr>
+        <td>地區列表</td>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+
+</body>
+
+<script>
+
+  function BindTable(dataArray) {
+    let el = document.querySelector('tbody')
+    let innerHtml = ''
+    dataArray.forEach(element => {
+      innerHtml += `<tr><td>${element}</td></tr>`
+    });
+    el.innerHTML = innerHtml
+  }
+
+  function GetData() {
+    let province = document.querySelector('#Province').value
+    let city = document.querySelector('#City').value
+
+    axios({
+      url: 'http://hmajax.itheima.net/api/area',
+      params: {
+        pname: province,
+        cname: city
+      }
+    }).then(function (result) {
+      BindTable(result.data.list)
+    })
+  }
+
+  let el = document.getElementById('SubmitBtn')
+  el.addEventListener('click', function (el) {
+    GetData()
+  })
+
+</script>
+
+</html>

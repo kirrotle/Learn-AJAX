@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <script src="./JS/axios/axios.min.js"></script>
+  <script src="./JS/form-serialize/form-serialize.js"></script>
   <link rel="stylesheet" href="./bootstrap5.3.3/css/bootstrap.min.css">
 </head>
 
@@ -38,7 +39,7 @@
       <div class="row">
         <div class="col-xl-3 col-md-6 col-sm-12">
           <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="Account" value="qazwsxedc">
+            <input type="text" class="form-control" id="Account" value="qazwsxedc" name="Account">
             <label for="Account">帳號名</label>
           </div>
         </div>
@@ -47,7 +48,7 @@
       <div class="row">
         <div class="col-xl-3 col-md-6 col-sm-12">
           <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="Pwd" value="12345678" autocomplete>
+            <input type="password" class="form-control" id="Pwd" value="12345678" name="Pwd" autocomplete>
             <label for="Pwd">密碼</label>
           </div>
         </div>
@@ -64,14 +65,17 @@
   el.addEventListener('click', Login)
 
   function Login() {
-    let account = document.querySelector('#Account').value
-    let pwd = document.querySelector('#Pwd').value
+    let form = document.querySelector('form')
+    console.log(form)
+    let data = serialize(form, { hash: true, empty: true })
+    let { Account, Pwd } = data
 
-    if (account.length <= 8) {
+
+    if (Account.length <= 8) {
       ShowMessage(false, '帳號需大於等於8碼')
       return
     }
-    if (pwd.length <= 6) {
+    if (Pwd.length <= 6) {
       ShowMessage(true, '密碼需大於等於6碼')
       return
     }
@@ -80,8 +84,8 @@
       url: 'https://hmajax.itheima.net/api/login',
       method: 'post',
       data: {
-        username: account,
-        password: pwd
+        username: Account,
+        password: Pwd
       }
     }).then((result) => {
       console.log(result)

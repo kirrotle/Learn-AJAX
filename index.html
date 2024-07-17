@@ -100,6 +100,10 @@
       el.setAttribute('class', 'alert alert-danger show')
     }
     el.innerText = message
+    setTimeout(() => {
+      el.classList.remove('show')
+      el.classList.add('hide')
+    }, 2000);
   }
 
 

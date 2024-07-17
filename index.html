@@ -6,49 +6,98 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <script src="./JS/axios/axios.min.js"></script>
+  <link rel="stylesheet" href="./bootstrap5.3.3/css/bootstrap.min.css">
 </head>
 
+<style>
+  .show {
+    opacity: 1;
+  }
+
+  .hide {
+    opacity: 0;
+  }
+</style>
+
 <body>
+  <div class="container">
+
+    <h3>歡迎-登陸</h3>
+
+    <div class="row">
+      <div class="col-xl-3 col-md-6 col-sm-12">
+        <div class="alert hide" id="HintMessage">提示訊息</div>
+      </div>
+    </div>
+
+    <form>
+      <div class="row">
+        <div class="col-xl-3 col-md-6 col-sm-12">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="Account" value="qazwsxedc">
+            <label for="Account">帳號名</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xl-3 col-md-6 col-sm-12">
+          <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="Pwd" value="12345678" autocomplete>
+            <label for="Pwd">密碼</label>
+          </div>
+        </div>
+      </div>
+      <!--因為buton type預設是submit,所以要將這個改為普通的button模式-->
+      <button type="button" class="btn btn-danger" id="LoginBtn">登陸</button>
+    </form>
+  </div>
 </body>
 
 <script>
 
-  //如果沒有這個帳號就註冊且登入,有的話就直接登入
-  function Register() {
-    axios({
-      url: 'http://hmajax.itheima.net/api/register',
-      method: 'post',
-      data: {
-        username: 'qazwsxedc',
-        password: '12345678'
-      }
-    }).then((result) => {
-      alert('註冊成功')
-      Login()
-    }).catch((result) => {
-      if (result.response.data.code === 10005) {
-        alert('已經註冊過,將執行Login')
-        Login()
-      }
-    })
-  }
+  let el = document.querySelector('#LoginBtn')
+  el.addEventListener('click', Login)
 
   function Login() {
+    let account = document.querySelector('#Account').value
+    let pwd = document.querySelector('#Pwd').value
+
+    if (account.length <= 8) {
+      ShowMessage(false, '帳號需大於等於8碼')
+      return
+    }
+    if (pwd.length <= 6) {
+      ShowMessage(true, '密碼需大於等於6碼')
+      return
+    }
+
     axios({
       url: 'https://hmajax.itheima.net/api/login',
       method: 'post',
       data: {
-        username: 'qazwsxedc',
-        password: '123456789'
+        username: account,
+        password: pwd
       }
     }).then((result) => {
-      alert(result.data.message)
+      console.log(result)
+      ShowMessage(true, result.data.message)
     }).catch((result) => {
-      alert(result.response.data.message)
+      ShowMessage(false, result.response.data.message)
     })
   }
 
-  Register()
+  function ShowMessage(success, message) {
+    let el = document.querySelector('#HintMessage')
+    if (success) {
+      el.setAttribute('class', 'alert alert-success show')
+    }
+    else {
+      el.setAttribute('class', 'alert alert-danger show')
+    }
+    el.innerText = message
+  }
+
 
 </script>
 

@@ -11,9 +11,13 @@
 
 <body>
 
-  <!-- Button trigger modal -->
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target=".test">
-    Launch demo modal
+  <!-- JS方法寫的彈框事件 -->
+  <button class="btn btn-primary" id="JsShowBtn">
+    JsShowBtn
+  </button>
+  <!-- 屬性方法寫的彈框事件 -->
+  <button type="button" class="btn btn-primary" id="PropertyBtn" data-bs-toggle="modal" data-bs-target=".test">
+    PropertyBtn
   </button>
 
   <!-- Modal -->
@@ -28,12 +32,12 @@
         </div>
         <!-- 彈窗身體 -->
         <div class="modal-body">
-          ...
+          <input class="form-control" type="text" id="userName" value="RDer" name="userName">
         </div>
         <!-- 彈窗底部 -->
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" id="JsSaveBtn" class="btn btn-primary">Save changes</button>
         </div>
       </div>
     </div>
@@ -42,6 +46,24 @@
 </body>
 
 <script>
+
+  let element = document.querySelector('.test')
+  let modal = new bootstrap.Modal(element)
+
+  document.querySelector('#JsShowBtn').addEventListener('click', function () {
+    //須注意這個不能寫在裡面,因為modal是new出來的,這樣子hide會出錯
+    //因為內部的狀態不是共享的
+    // let element = document.querySelector('.test')
+    // let modal = new bootstrap.Modal(element)
+    modal.show()
+  })
+
+  let el = document.querySelector('#JsSaveBtn')
+  el.addEventListener('click', function () {
+    // let element = document.querySelector('.test')
+    // let modal = new bootstrap.Modal(element)
+    modal.hide()
+  })
 
 </script>
 

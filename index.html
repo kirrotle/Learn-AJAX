@@ -5,111 +5,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="./JS/axios/axios.min.js"></script>
-  <script src="./JS/form-serialize/form-serialize.js"></script>
+  <script src="./bootstrap5.3.3/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="./bootstrap5.3.3/css/bootstrap.min.css">
 </head>
 
-<style>
-  .show {
-    opacity: 1;
-  }
-
-  .hide {
-    opacity: 0;
-  }
-
-  .alert {
-    transition: 0.5s;
-  }
-</style>
-
 <body>
-  <div class="container">
 
-    <h3>歡迎-登陸</h3>
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target=".test">
+    Launch demo modal
+  </button>
 
-    <div class="row">
-      <div class="col-xl-3 col-md-6 col-sm-12">
-        <div class="alert hide" id="HintMessage">提示訊息</div>
+  <!-- Modal -->
+  <div class="modal fade test" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <!-- 彈窗內容 -->
+      <div class="modal-content">
+        <!-- 彈窗頭部 -->
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- 彈窗身體 -->
+        <div class="modal-body">
+          ...
+        </div>
+        <!-- 彈窗底部 -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
       </div>
     </div>
-
-    <form>
-      <div class="row">
-        <div class="col-xl-3 col-md-6 col-sm-12">
-          <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="Account" value="qazwsxedc" name="Account">
-            <label for="Account">帳號名</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-xl-3 col-md-6 col-sm-12">
-          <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="Pwd" value="12345678" name="Pwd" autocomplete>
-            <label for="Pwd">密碼</label>
-          </div>
-        </div>
-      </div>
-      <!--因為buton type預設是submit,所以要將這個改為普通的button模式-->
-      <button type="button" class="btn btn-danger" id="LoginBtn">登陸</button>
-    </form>
   </div>
+
 </body>
 
 <script>
-
-  let el = document.querySelector('#LoginBtn')
-  el.addEventListener('click', Login)
-
-  function Login() {
-    let form = document.querySelector('form')
-    console.log(form)
-    let data = serialize(form, { hash: true, empty: true })
-    let { Account, Pwd } = data
-
-
-    if (Account.length <= 8) {
-      ShowMessage(false, '帳號需大於等於8碼')
-      return
-    }
-    if (Pwd.length <= 6) {
-      ShowMessage(true, '密碼需大於等於6碼')
-      return
-    }
-
-    axios({
-      url: 'https://hmajax.itheima.net/api/login',
-      method: 'post',
-      data: {
-        username: Account,
-        password: Pwd
-      }
-    }).then((result) => {
-      console.log(result)
-      ShowMessage(true, result.data.message)
-    }).catch((result) => {
-      ShowMessage(false, result.response.data.message)
-    })
-  }
-
-  function ShowMessage(success, message) {
-    let el = document.querySelector('#HintMessage')
-    if (success) {
-      el.setAttribute('class', 'alert alert-success show')
-    }
-    else {
-      el.setAttribute('class', 'alert alert-danger show')
-    }
-    el.innerText = message
-    setTimeout(() => {
-      el.classList.remove('show')
-      el.classList.add('hide')
-    }, 2000);
-  }
-
 
 </script>
 

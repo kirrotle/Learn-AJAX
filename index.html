@@ -6,64 +6,249 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <script src="./bootstrap5.3.3/js/bootstrap.min.js"></script>
+  <script src="./JS/form-serialize/form-serialize.js"></script>
+  <script src="./JS/axios/axios.min.js"></script>
   <link rel="stylesheet" href="./bootstrap5.3.3/css/bootstrap.min.css">
 </head>
 
+<style>
+  .title {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  body {
+    margin-top: 20px;
+  }
+</style>
+
 <body>
+  <div class="container">
 
-  <!-- JS方法寫的彈框事件 -->
-  <button class="btn btn-primary" id="JsShowBtn">
-    JsShowBtn
-  </button>
-  <!-- 屬性方法寫的彈框事件 -->
-  <button type="button" class="btn btn-primary" id="PropertyBtn" data-bs-toggle="modal" data-bs-target=".test">
-    PropertyBtn
-  </button>
+    <!-- 標頭 -->
+    <div class="title">
+      <h3>圖書管理</h3>
+      <button id="addBtn" class="btn btn-primary">+添加</button>
+    </div>
 
-  <!-- Modal -->
-  <div class="modal fade test" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <!-- 彈窗內容 -->
-      <div class="modal-content">
-        <!-- 彈窗頭部 -->
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <!-- 彈窗身體 -->
-        <div class="modal-body">
-          <input class="form-control" type="text" id="userName" value="RDer" name="userName">
-        </div>
-        <!-- 彈窗底部 -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" id="JsSaveBtn" class="btn btn-primary">Save changes</button>
+    <!-- 表格 -->
+    <table class="table">
+      <thead>
+        <tr class="table-danger">
+          <td>序號</td>
+          <td>書名</td>
+          <td>作者</td>
+          <td>出版社</td>
+          <td>操作</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>書名</td>
+          <td>作者</td>
+          <td>出版社</td>
+          <td>
+            <button onclick="" class="btn btn-danger">刪除</button>
+            <button onclick="" class="btn btn-info">編輯</button>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+    <!-- 添加彈窗 -->
+    <div class="modal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">添加圖書</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="createBook" action="#">
+              <input type="hidden" id="id" name="id" value="1">
+              <label for="bookName">書名</label>
+              <input class="form-control" id="bookName" name="bookName" type="text" value="">
+              <label for="author">作者</label>
+              <input class="form-control" id="author" name="author" type="text" value="">
+              <label for="publisher">出版社</label>
+              <input class="form-control" id="publisher" name="publisher" type="text" value="">
+              <input type="hidden" id="isCreate" name="isCreate" value="1">
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button id="saveBtn" type="button" class="btn btn-primary">Save</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
+  </div>
 </body>
 
 <script>
+  //#region 頁面載入
 
-  let element = document.querySelector('.test')
-  let modal = new bootstrap.Modal(element)
-
-  document.querySelector('#JsShowBtn').addEventListener('click', function () {
-    //須注意這個不能寫在裡面,因為modal是new出來的,這樣子hide會出錯
-    //因為內部的狀態不是共享的
-    // let element = document.querySelector('.test')
-    // let modal = new bootstrap.Modal(element)
-    modal.show()
+  document.addEventListener('DOMContentLoaded', function () {
+    GetBookData()
   })
 
-  let el = document.querySelector('#JsSaveBtn')
-  el.addEventListener('click', function () {
-    // let element = document.querySelector('.test')
-    // let modal = new bootstrap.Modal(element)
+  //#endregion
+
+  //#region 資料載入
+
+  function GetBookData() {
+    axios({
+      url: 'https://hmajax.itheima.net/api/books',
+      params: {
+        creator
+      }
+    }).then((result) => {
+      BindTable(result.data.data)
+    }).catch((err) => {
+      return {}
+    });
+  }
+
+  function BindTable(data) {
+    let tbody = document.querySelector('tbody')
+    let text = ''
+    data.forEach(element => {
+      let { id, bookname, author, publisher } = element
+      text +=
+        `<tr>
+        <td>${id}</td>
+        <td>${bookname}</td>
+        <td>${author}</td>
+        <td>${publisher}</td>
+        <td>
+          <button onclick="DeleteBook(${id})" class="btn btn-danger">刪除</button>
+          <button onclick="UpdateModal(${id},'${bookname}','${author}','${publisher}')" class="btn btn-info">編輯</button>
+        </td>
+      </tr>`
+    })
+    tbody.innerHTML = text
+  }
+
+  //#endregion
+
+  //#region 全域變數
+  const creator = 'RDer'
+  let modal = new bootstrap.Modal('.modal')
+  //#endregion
+
+  //#region 事件綁定
+
+  let addBtn = document.querySelector('#addBtn')
+  addBtn.addEventListener('click', function () {
+    AddModal()
+  })
+
+  let saveBtn = document.querySelector('#saveBtn')
+  saveBtn.addEventListener('click', function () {
+    let isCreate = document.querySelector('#isCreate').value
+    console.log(isCreate)
+    if (isCreate != 0) {
+      AddBook()
+    }
+    else {
+      UpdateBook()
+    }
+
     modal.hide()
   })
+
+
+  //#endregion
+
+  //#region operate(增刪改)
+
+  function AddBook() {
+    let createBook = document.querySelector('#createBook')
+    let data = serialize(createBook, { hash: true })
+    let { bookName, author, publisher } = data
+
+    axios({
+      url: 'https://hmajax.itheima.net/api/books',
+      method: 'post',
+      data: {
+        bookname: bookName,
+        author: author,
+        publisher: publisher,
+        creator: creator
+      }
+    }).then((result) => {
+      GetBookData()
+    }).catch((err) => {
+      console.log(err)
+    });
+  }
+
+  function DeleteBook(id) {
+    axios({
+      url: `https://hmajax.itheima.net/api/books/${id}`,
+      method: 'delete'
+    }).then((result) => {
+      GetBookData()
+    }).catch((err) => {
+      console.log('wrong')
+    });
+  }
+
+  function UpdateBook() {
+    let [id, bookName, author, publisher] = [
+      document.querySelector('#id').value,
+      document.querySelector('#bookName').value,
+      document.querySelector('#author').value,
+      document.querySelector('#publisher').value,
+      document.querySelector('#isCreate').value
+    ]
+    console.log(id)
+    axios({
+      url: `https://hmajax.itheima.net/api/books/${id}`,
+      method: 'put',
+      data: {
+        bookname: bookName,
+        author: author,
+        publisher: publisher,
+        creator: creator
+      }
+    }).then((result) => {
+      GetBookData()
+    }).catch((err) => {
+      console.log(err)
+    });
+  }
+
+  //#endregion
+
+  //#region 顯示modal的前處理
+
+  function AddModal() {
+    //初始化值
+    document.querySelector('#id').value = ''
+    document.querySelector('#bookName').value = ''
+    document.querySelector('#author').value = ''
+    document.querySelector('#publisher').value = ''
+    document.querySelector('#isCreate').value = '1'
+    modal.show()
+  }
+
+  function UpdateModal(id, bookName, author, publisher) {
+    //初始化值
+    document.querySelector('#id').value = id
+    document.querySelector('#bookName').value = bookName
+    document.querySelector('#author').value = author
+    document.querySelector('#publisher').value = publisher
+    document.querySelector('#isCreate').value = '0'
+
+    modal.show()
+  }
+
+  //#endregion
+
 
 </script>
 

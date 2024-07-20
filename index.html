@@ -31,12 +31,18 @@
   let el = document.querySelector('#upload')
   el.addEventListener('change', function (e) {
     //須注意這邊的取值方式
+    //e.target.files[0]取得的是檔案,
+    //但顯示在console那邊是一個Object,
+    //裡面是檔案的資訊
     console.dir(e.target.files[0])
     let file = e.target.files[0]
 
     let formdata = new FormData()
+    //這邊會填img是因為後端要取得變數名字為img的資料
+    //並不是副檔名為img的檔案
     formdata.append('img', file)
 
+    //這邊data已經不是帶Json了,是帶formdata
     axios({
       url: 'https://hmajax.itheima.net/api/uploadimg',
       method: 'post',

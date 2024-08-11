@@ -6,48 +6,157 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <script src="./JS/axios/axios.min.js"></script>
+  <script src="./bootstrap5.3.3/js/bootstrap.min.js"></script>
+  <script src="./JS/form-serialize/form-serialize.js"></script>
+  <link rel="stylesheet" href="./bootstrap5.3.3/css/bootstrap.min.css">
 </head>
 
 <style>
-  input[type="file"] {
+  alert-none {
+    transition: 0.5s;
     display: none;
-  }
-
-  body {
-    height: 1000px;
   }
 </style>
 
 <body>
-  <label for="upload">
-    上傳
-    <input type="file" id="upload">
-  </label>
+  <!-- 警告標示 -->
+  <div id="alert" class="alert alert-none">
+  </div>
+  <!-- 畫面顯示 -->
+  <div class="container">
+    <div class="row">
+      <!-- NavBar -->
+      <div class="Nav col-2">
+        <ul class="nav flex-column nav-pills">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Active</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Active</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="#">Active</a>
+          </li>
+        </ul>
+      </div>
+      <!-- 基本設置 -->
+      <div class="col-8">
+        <h3>基本設置</h3>
+        <form id="personalData">
+          <label for="email">郵件信箱</label>
+          <input class="form-control" type="email" name="email" id="email">
+          <label for="nickname">暱稱</label>
+          <input class="form-control" type="text" name="nickname" id="nickname">
+          <label>性別</label>
+          <br>
+          <input class="form-check-input" type="radio" id="gender" name="gender" value="1" checked>女
+          <input class="form-check-input" type="radio" id="gender" name="gender" value="0">男
+          <br>
+          <label>個人簡介</label>
+          <textarea class="form-control" name="desc" id="desc" rows="3"></textarea>
+          <button id="submit" type="button" class="btn btn-primary">送出</button>
+        </form>
+      </div>
+      <!-- 頭像 -->
+      <div class="col-2">
+        <label for="">頭像</label>
+        <img id="image" src="./Images/1.svg">
+        <label for="upload">更換頭像</label>
+        <input type="file" id="upload" style="display: none;">
+        </d｛iv>
+        </d｛iv>
+      </div>
 </body>
 
 <script>
+  const Creator = 'RDer'
 
-  let imageUrl = localStorage.getItem('imageUrl')
-  //判斷要是沒值的話就不執行後面那段
-  imageUrl && (document.body.style.backgroundImage = `url(${imageUrl})`);
+  window.addEventListener('DOMContentLoaded', function (e) {
+    //預先載入資料
+    axios({
+      method: 'get',
+      url: `https://hmajax.itheima.net/api/settings?creator=${Creator}`
+    }).then((result) => {
+      bindFormData(result.data.data)
+    }).catch((err) => {
+      console.log(err)
+    });
+    //預先載入圖片
+    let image = localStorage.getItem('image')
+    document.querySelector('#image').setAttribute('src', image)
+  })
 
-  document.querySelector('#upload').addEventListener('change', function (e) {
-    let data = new FormData();
-    data.append('img', e.target.files[0])
+  document.querySelector('#submit').addEventListener('click', function () {
+    let form = document.querySelector('#personalData')
+    let data = serialize(form, { hash: true, empty: true })
+    //gender需做特殊處理
+    data.gender = Number(data.gender)
+    data.creator = Creator
 
     axios({
-      method: 'post',
-      url: 'https://hmajax.itheima.net/api/uploadimg',
+      method: 'put',
+      url: 'https://hmajax.itheima.net/api/settings',
       data
     }).then((result) => {
-      localStorage.setItem('imageUrl', result.data.data.url)
-      let body = document.body
-      body.style.backgroundImage = `url(${result.data.data.url})`
+      console.log(result.data.message)
+      showAlert(result.data.message, true)
     }).catch((err) => {
-      console.log(err);
+      console.log(err)
     });
   })
 
+  document.querySelector('#upload').addEventListener('change', function (e) {
+    let file = e.target.files[0]
+    let formdata = new FormData()
+    formdata.append('avatar', file)
+    formdata.append('creator', Creator)
+    axios({
+      method: 'put',
+      url: 'https://hmajax.itheima.net/api/avatar',
+      data: formdata
+    }).then((result) => {
+      console.log(result)
+      showAlert(data.message, true)
+      localStorage.setItem('image', result.data.data.avatar)
+      let image = document.querySelector('#image')
+      image.setAttribute('src', result.data.data.avatar)
+    }).catch((err) => {
+      console.log(err)
+    });
+  })
+
+  function bindFormData(data) {
+    for (let key in data) {
+
+      //gender需要做特別的處理
+      if (key === 'gender') {
+        let radio = document.querySelector(`#gender[value="${data[key]}"]`);
+        radio.checked = true
+      }
+
+      let el = document.querySelector(`#${key}`)
+      if (el !== null) {
+        el.value = data[key]
+      }
+    }
+  }
+
+  function showAlert(message, isSuccess) {
+    let el = document.querySelector('#alert')
+    el.innerText = message
+    el.classList.remove('alert-none')
+    el.classList.remove('alert-success')
+    el.classList.remove('alert-danger')
+
+    el.classList.add(isSuccess ? 'alert-success' : 'alert-danger')
+    setTimeout(function () {
+      el.classList.add('alert-none')
+      el.classList.remove('alert-success')
+      el.classList.remove('alert-danger')
+      el.innerText = ''
+    }, 3000)
+
+  }
 
 </script>
 

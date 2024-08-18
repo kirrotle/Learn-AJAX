@@ -12,12 +12,20 @@
 </body>
 
 <script>
+
   let xhr = new XMLHttpRequest();
-  xhr.open('get', 'https://hmajax.itheima.net/api/province')
-  xhr.addEventListener('loadend', function () {
-    let data = JSON.parse(xhr.response)
-    console.log(data)
-    document.body.innerHTML = data.list.join('<br>')
+  let params = new URLSearchParams({
+    pname: '辽宁省'
+  })
+  console.log(params.toString())
+  xhr.open('get', `https://hmajax.itheima.net/api/city?${params.toString()}`)
+
+  xhr.addEventListener('loadend', function (e) {
+    console.log(e);
+    console.log(this);
+    console.log(this.response);
+    let cityList = JSON.parse(this.response).list
+    document.body.innerHTML = cityList.join("<br>")
   })
   xhr.send();
 

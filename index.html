@@ -12,22 +12,33 @@
 </body>
 
 <script>
+  let p = new Promise(function (resolve, reject) {
+    //執行成功或失敗時,會馬上跳離function執行then或是catch方法
+    //不能同時成功及失敗
+    setTimeout(() => {
+      resolve('模擬ajax送出成功')
+    }, 3000);
 
-  let xhr = new XMLHttpRequest();
-  let params = new URLSearchParams({
-    pname: '辽宁省'
+    setTimeout(() => {
+      reject('模擬ajax送出失敗')
+    }, 1000);
   })
-  console.log(params.toString())
-  xhr.open('get', `https://hmajax.itheima.net/api/city?${params.toString()}`)
 
-  xhr.addEventListener('loadend', function (e) {
-    console.log(e);
-    console.log(this);
-    console.log(this.response);
-    let cityList = JSON.parse(this.response).list
-    document.body.innerHTML = cityList.join("<br>")
+  //可以這樣子寫(一般寫法)
+  p.then(function (result) {
+    console.log(result)
+  }).catch(function (error) {
+    console.log(error)
   })
-  xhr.send();
+
+  //或是這樣(分開寫法)
+  p.then(function (result) {
+    console.log(result)
+  })
+
+  p.catch(function (error) {
+    console.log(error)
+  })
 
 </script>
 

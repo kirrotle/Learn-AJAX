@@ -13,30 +13,20 @@
 
 <script>
   let p = new Promise(function (resolve, reject) {
-    //執行成功或失敗時,會馬上跳離function執行then或是catch方法
-    //不能同時成功及失敗
+
     setTimeout(() => {
       resolve('模擬ajax送出成功')
+      reject(new Error('模擬ajax送出失敗'))
     }, 3000);
 
-    setTimeout(() => {
-      reject('模擬ajax送出失敗')
-    }, 1000);
   })
 
-  //可以這樣子寫(一般寫法)
+  console.log(p)
+
   p.then(function (result) {
+    console.log(p)
     console.log(result)
   }).catch(function (error) {
-    console.log(error)
-  })
-
-  //或是這樣(分開寫法)
-  p.then(function (result) {
-    console.log(result)
-  })
-
-  p.catch(function (error) {
     console.log(error)
   })
 

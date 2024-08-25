@@ -12,23 +12,72 @@
 </body>
 
 <script>
-  let p = new Promise(function (resolve, reject) {
 
-    setTimeout(() => {
-      resolve('模擬ajax送出成功')
-      reject(new Error('模擬ajax送出失敗'))
-    }, 3000);
+  function myAxios(config) {
+    return new Promise(function (resolve, reject) {
+      //先建立對象
+      let xhr = new XMLHttpRequest()
 
-  })
+      if (config.params) {
+        let params = new URLSearchParams()
+        for (let param in config.params) {
+          params.append(param, config.params[param])
+        }
+        xhr.open(config.method, `${config.url}?${params.toString()}`)
+      } else {
+        xhr.open(config.method, config.url)
+      }
 
-  console.log(p)
+      //觸發事件
+      xhr.addEventListener('loadend', function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(JSON.parse(xhr.response))
+        } else {
+          reject(JSON.parse(xhr.response))
+        }
+      })
 
-  p.then(function (result) {
-    console.log(p)
+      //設置標頭
+      if (String(config.method).toUpperCase() === 'POST') {
+        xhr.setRequestHeader('Content-Type', 'application/json')
+      }
+
+      //如果是Post方法須傳送資料
+      if (String(config.method).toUpperCase() === 'POST') {
+        console.log(JSON.stringify(config.data))
+        xhr.send(JSON.stringify(config.data))
+      } else {
+        xhr.send()
+      }
+
+    })
+  }
+
+  myAxios({
+    method: 'get',
+    url: 'https://hmajax.itheima.net/api/city',
+    params: {
+      pname: '辽宁省'
+    }
+  }).then(function (result) {
     console.log(result)
-  }).catch(function (error) {
-    console.log(error)
+  }).catch(function (result) {
+    console.log(result)
   })
+
+  myAxios({
+    method: 'POST',
+    url: 'https://hmajax.itheima.net/api/register',
+    data: {
+      username: 'ooo111111',
+      password: 'a12345678'
+    }
+  }).then(function (result) {
+    console.log(result)
+  }).catch(function (result) {
+    console.log(result)
+  })
+
 
 </script>
 

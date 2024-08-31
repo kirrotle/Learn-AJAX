@@ -5,79 +5,67 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <script src="./JS/axios/axios.min.js"></script>
+
 </head>
 
 <body>
-
+  省份:<select id="province"></select>
+  城市:<select id="city"></select>
+  地區:<select id="area"></select>
 </body>
 
 <script>
-
-  function myAxios(config) {
-    return new Promise(function (resolve, reject) {
-      //先建立對象
-      let xhr = new XMLHttpRequest()
-
-      if (config.params) {
-        let params = new URLSearchParams()
-        for (let param in config.params) {
-          params.append(param, config.params[param])
-        }
-        xhr.open(config.method, `${config.url}?${params.toString()}`)
-      } else {
-        xhr.open(config.method, config.url)
-      }
-
-      //觸發事件
-      xhr.addEventListener('loadend', function () {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(JSON.parse(xhr.response))
-        } else {
-          reject(JSON.parse(xhr.response))
-        }
-      })
-
-      //設置標頭
-      if (String(config.method).toUpperCase() === 'POST') {
-        xhr.setRequestHeader('Content-Type', 'application/json')
-      }
-
-      //如果是Post方法須傳送資料
-      if (String(config.method).toUpperCase() === 'POST') {
-        console.log(JSON.stringify(config.data))
-        xhr.send(JSON.stringify(config.data))
-      } else {
-        xhr.send()
-      }
-
+  axios({
+    url: 'https://hmajax.itheima.net/api/province',
+    type: 'get'
+  }).then(function (result) {
+    console.log(result);
+    let el = document.querySelector('#province')
+    let provinceList = result.data.list
+    provinceList.map(function (province) {
+      let subEl = document.createElement('option')
+      subEl.setAttribute('value', province)
+      subEl.innerText = province
+      el.appendChild(subEl)
     })
-  }
-
-  myAxios({
-    method: 'get',
-    url: 'https://hmajax.itheima.net/api/city',
-    params: {
-      pname: '辽宁省'
-    }
-  }).then(function (result) {
-    console.log(result)
-  }).catch(function (result) {
-    console.log(result)
+    //透過傳回的第一個省份再去呼叫
+    axios({
+      url: 'https://hmajax.itheima.net/api/city',
+      type: 'get',
+      params: {
+        pname: provinceList[0]
+      }
+    }).then(function (result) {
+      let cityList = result.data.list
+      let el = document.querySelector('#city')
+      cityList.map(function (city) {
+        let subEl = document.createElement('option')
+        subEl.setAttribute('value', city)
+        subEl.innerText = city
+        el.appendChild(subEl)
+      })
+      //傳回省份跟城市再去呼叫
+      axios({
+        url: 'https://hmajax.itheima.net/api/area',
+        type: 'get',
+        params: {
+          pname: provinceList[0],
+          cname: cityList[0]
+        }
+      }).then(function (result) {
+        console.log(result)
+        let areaList = result.data.list
+        let el = document.querySelector('#area')
+        areaList.map(function (area) {
+          let subEl = document.createElement('option')
+          subEl.setAttribute('value', area)
+          subEl.innerText = area
+          el.appendChild(subEl)
+        })
+      })
+    })
   })
-
-  myAxios({
-    method: 'POST',
-    url: 'https://hmajax.itheima.net/api/register',
-    data: {
-      username: 'ooo111111',
-      password: 'a12345678'
-    }
-  }).then(function (result) {
-    console.log(result)
-  }).catch(function (result) {
-    console.log(result)
-  })
-
 
 </script>
 

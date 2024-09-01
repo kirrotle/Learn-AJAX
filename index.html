@@ -10,61 +10,41 @@
 </head>
 
 <body>
-  省份:<select id="province"></select>
-  城市:<select id="city"></select>
-  地區:<select id="area"></select>
+
 </body>
 
 <script>
-  axios({
-    url: 'https://hmajax.itheima.net/api/province',
-    type: 'get'
-  }).then(function (result) {
-    console.log(result);
-    let el = document.querySelector('#province')
-    let provinceList = result.data.list
-    provinceList.map(function (province) {
-      let subEl = document.createElement('option')
-      subEl.setAttribute('value', province)
-      subEl.innerText = province
-      el.appendChild(subEl)
+
+  //先取得地區
+  let p = new Promise(function (resolve, reject) {
+    setTimeout(() => {
+      console.log('台北')
+      resolve('台北')
+    }, 2000)
+  })
+
+  //再取得市區
+  //p1是直接吃到return的Promise,並沒有再另外封裝
+  let p1 = p.then(function (result) {
+    return new Promise(function (resolve, reject) {
+      setTimeout(() => {
+        console.log(`透過${result}取得台北市`)
+        resolve(`透過${result}取得台北市`)
+      }, 2000);
     })
-    //透過傳回的第一個省份再去呼叫
-    axios({
-      url: 'https://hmajax.itheima.net/api/city',
-      type: 'get',
-      params: {
-        pname: provinceList[0]
-      }
-    }).then(function (result) {
-      let cityList = result.data.list
-      let el = document.querySelector('#city')
-      cityList.map(function (city) {
-        let subEl = document.createElement('option')
-        subEl.setAttribute('value', city)
-        subEl.innerText = city
-        el.appendChild(subEl)
-      })
-      //傳回省份跟城市再去呼叫
-      axios({
-        url: 'https://hmajax.itheima.net/api/area',
-        type: 'get',
-        params: {
-          pname: provinceList[0],
-          cname: cityList[0]
-        }
-      }).then(function (result) {
-        console.log(result)
-        let areaList = result.data.list
-        let el = document.querySelector('#area')
-        areaList.map(function (area) {
-          let subEl = document.createElement('option')
-          subEl.setAttribute('value', area)
-          subEl.innerText = area
-          el.appendChild(subEl)
-        })
-      })
-    })
+  })
+
+  //代表p1是一個p派生的promise
+  console.log(p1 === p)
+  console.log(p1)
+
+  //這次沒有因為return的時候不是Promise對象,所以會被封裝成Promise丟給p2
+  let p2 = p1.then(function (result) {
+    return `${result},再取得松山區`
+  })
+
+  p2.then(function (result) {
+    console.log(result)
   })
 
 </script>

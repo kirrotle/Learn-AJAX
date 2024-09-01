@@ -16,42 +16,32 @@
 </body>
 
 <script>
+  GetSelectData()
 
-  let p = axios({
-    url: 'https://hmajax.itheima.net/api/province',
-    type: 'get'
-  })
+  async function GetSelectData() {
+    let provinceData = await axios({
+      url: 'https://hmajax.itheima.net/api/province'
+    })
 
-  //因為最後要取得地區時無法取得第一個省分,
-  //所以要寫一個全域變數才接的到
-  let pname
-  let p1 = p.then(function (result) {
-    bindSelectList(result.data.list, 'province')
-    pname = result.data.list[0]
-    return axios({
+    let cityData = await axios({
       url: 'https://hmajax.itheima.net/api/city',
-      type: 'get',
       params: {
-        pname: result.data.list[0]
+        pname: provinceData.data.list[0]
       }
     })
-  })
 
-  let p2 = p1.then(function (result) {
-    bindSelectList(result.data.list, 'city')
-    return axios({
+    let areaData = await axios({
       url: 'https://hmajax.itheima.net/api/area',
-      type: 'get',
       params: {
-        pname: pname,
-        cname: result.data.list[0]
+        pname: provinceData.data.list[0],
+        cname: cityData.data.list[0]
       }
     })
-  })
 
-  p2.then(function (result) {
-    bindSelectList(result.data.list, 'area')
-  })
+    bindSelectList(provinceData.data.list, 'province')
+    bindSelectList(cityData.data.list, 'city')
+    bindSelectList(areaData.data.list, 'area')
+  }
 
   function bindSelectList(listData, id) {
     let el = document.querySelector(`#${id}`)

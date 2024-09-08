@@ -10,48 +10,22 @@
 </head>
 
 <body>
-  省份:<select id="province"></select>
-  城市:<select id="city"></select>
-  地區:<select id="area"></select>
+
 </body>
 
 <script>
-  GetSelectData()
 
-  async function GetSelectData() {
-    let provinceData = await axios({
-      url: 'https://hmajax.itheima.net/api/province'
-    })
+  let p1 = axios({
+    url: 'https://hmajax.itheima.net/api/weather/city',
+    params: {
+      city: '440100'
+    }
+  })
 
-    let cityData = await axios({
-      url: 'https://hmajax.itheima.net/api/city',
-      params: {
-        pname: provinceData.data.list[0]
-      }
-    })
+  p1.then(function (result) {
+    console.log(result)
+  })
 
-    let areaData = await axios({
-      url: 'https://hmajax.itheima.net/api/area',
-      params: {
-        pname: provinceData.data.list[0],
-        cname: cityData.data.list[0]
-      }
-    })
-
-    bindSelectList(provinceData.data.list, 'province')
-    bindSelectList(cityData.data.list, 'city')
-    bindSelectList(areaData.data.list, 'area')
-  }
-
-  function bindSelectList(listData, id) {
-    let el = document.querySelector(`#${id}`)
-    listData.map(function (data) {
-      let subEl = document.createElement('option')
-      subEl.setAttribute('value', data)
-      subEl.innerText = data
-      el.appendChild(subEl)
-    })
-  }
 </script>
 
 </html>

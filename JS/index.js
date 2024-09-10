@@ -1,16 +1,27 @@
-const fs = require('fs')
 const path = require('path')
+const fs = require('fs')
 
-console.log(__dirname)
-//..也可以做判斷喔
-let textPath = path.join(__dirname, '../Test/Test.txt')
-console.log(textPath)
+let htmlPath = path.join(__dirname, '../index.html')
 
-fs.readFile(textPath, function (err, data) {
-  //須注意的事情是讀取的資料為16進制
-  //並且對應的data對象為Buffer
-  //所以還需要使用toString()來轉換
-  console.dir(data)
-  console.log(data)
-  console.log(data.toString())
+let p = new Promise(function (resolve, reject) {
+  fs.readFile(htmlPath, function (err, data) {
+    let text = data.toString();
+    text = text.replaceAll(/\r\n/g, '')
+    resolve(text)
+  })
 })
+
+p.then(function (result) {
+  fs.writeFile('./test.html', result, function (err) {
+    if (err)
+      console.log('寫入失敗')
+    else
+      console.log('寫入成功')
+  })
+})
+
+
+
+
+
+

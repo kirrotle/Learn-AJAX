@@ -1,27 +1,19 @@
-const path = require('path')
+const http = require('http')
 const fs = require('fs')
 
-let htmlPath = path.join(__dirname, '../index.html')
+let server = http.createServer()
 
-let p = new Promise(function (resolve, reject) {
-  fs.readFile(htmlPath, function (err, data) {
-    let text = data.toString();
-    text = text.replaceAll(/\r\n/g, '')
-    resolve(text)
+server.on('request', function (request, response) {
+  console.log(request)
+  response.setHeader('content-type', 'text/html')
+  fs.readFile('../index.html', function (err, data) {
+    response.end(data.toString())
   })
 })
 
-p.then(function (result) {
-  fs.writeFile('./test.html', result, function (err) {
-    if (err)
-      console.log('寫入失敗')
-    else
-      console.log('寫入成功')
-  })
+server.listen(3000, function (err) {
+  if (err)
+    console.log(err)
+  else
+    console.log('網站啟動成功')
 })
-
-
-
-
-
-

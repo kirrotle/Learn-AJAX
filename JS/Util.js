@@ -7,7 +7,7 @@ const sum =
     return result
   }
 
-module.exports = {
+export default {
   index: indexHtml,
   sumFun: sum
 }
